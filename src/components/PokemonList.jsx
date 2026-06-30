@@ -1,30 +1,27 @@
-import { Grid } from "@mui/material";
 import { useState, useEffect } from "react";
-//import {pokemons} from "../data/pokemons";
+import { pokemons as fallbackPokemons } from "../data/pokemons";
 import PokemonCard from "./PokemonCard";
 import { fetchPokemons } from "../services/pokemonService";
 
 export default function PokemonList() {
-    const [pokemons, setPokemons] = useState([]);
+    const [pokemons, setPokemons] = useState(fallbackPokemons);
     useEffect(() => {
-
             fetchPokemons().then((data) => {
-                setPokemons(data);
+                if (Array.isArray(data) && data.length > 0) {
+                    setPokemons(data);
+                }
             }).catch((error) => {
-                alert("Error obtenido intentelo mas tarde " );
-                console.error("Error Obtenido", error);
+                console.warn("Fetch Pokemons failed, using local data", error);
             });
         }, []);
     
     return (
-        <Grid container spacing={2}>
-            {pokemons.map(
-                (pokemonItem) => (
-                    <Grid key={pokemonItem.id} size={{ xs: 12, sm: 6, md: 4 }}>
-                        <PokemonCard pokemon={pokemonItem} />
-                    </Grid>
-                )
-            )} 
-        </Grid>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
+            {pokemons.map((pokemonItem) => (
+                <div key={pokemonItem.id} style={{ flex: '1 1 calc(33.333% - 16px)', boxSizing: 'border-box' }}>
+                    <PokemonCard pokemon={pokemonItem} />
+                </div>
+            ))}
+        </div>
     )
 }
